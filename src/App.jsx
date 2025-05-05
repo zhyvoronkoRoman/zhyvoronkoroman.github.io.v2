@@ -7,6 +7,12 @@ import './styles.css';
 import './scripts.js';
 import { useStickyNavbar, useMenuToggle } from './scripts.js'; // тільки хук-ефекти
 
+const initialCars = [
+    { name: "Toyota Corolla", price: "5000 грн", transmission: "Механіка", quantity: 4, img: "img/corolla.jpg" },
+    { name: "BMW X5", price: "8000 грн", transmission: "Автомат", quantity: 6, img: "img/bmw.jpg" },
+    { name: "Ford Focus", price: "4000 грн", transmission: "Механіка", quantity: 2, img: "img/focus.jpg" }
+];
+
 function HomePage({ bookCar }) {
   const navigate = useNavigate();
   useStickyNavbar();
@@ -18,30 +24,20 @@ function HomePage({ bookCar }) {
       distance: '50px',
     });
   }, []);
-  const cars = [
-    {
-      name: "Toyota Corolla",
-      price: 5000 + " грн",
-      transmission: "Механіка",
-      quantity: 4,
-      img: "img/corolla.jpg",
-    },
-    {
-      name: "BMW X5",
-      price: 8000 + " грн",
-      transmission: "Автомат",
-      quantity: 6,
-      img: "img/bmw.jpg",
-    },
-    {
-      name: "Ford Focus",
-      price: 4000 + " грн",
-      transmission: "Механіка",
-      quantity: 2,
-      img: "img/focus.jpg",
-    }
-  ];
-
+  
+  const [cars, setCars] = useState(initialCars);
+    const handleBookCar = (carName) => {bookCar?.(carName);
+  
+      // Зменшити кількість доступних машин після бронювання
+      setCars(prevCars =>
+        prevCars.map(car =>
+          car.name === carName && car.quantity > 0
+            ? { ...car, quantity: car.quantity - 1 }
+            : car
+        )
+      );
+    };
+  
   return (
     <>
       {/* Навігація */}
@@ -55,9 +51,9 @@ function HomePage({ bookCar }) {
             <i className="fas fa-times close-btn"></i>
           </div>
           <Link to="/collection" className="nav-link">Машини</Link>
-          <a href="/#about" className="nav-link">Про Нас</a>
+          <Link to ="/#about" className="nav-link">Про Нас</Link>
           <Link to="/yourbooks" className="nav-link">Ваші бронювання</Link>
-          <button className="btn-2" onClick={() => navigate('/booking')}>
+          <button className="btn-2 btn-nav" onClick={() => navigate('/booking')}>
             Розпочати
           </button>
         </div>
@@ -80,7 +76,7 @@ function HomePage({ bookCar }) {
 
       {/* Колекція машин */}
       <section className="collection">
-        <h1>Наші найновіші машини</h1>
+        <h1>Наші найпопулярніші автомобілі</h1>
         <div className="collection-container">
           {cars.map((car, index) => (
             <div key={index} className="collection-car-item">
@@ -104,13 +100,17 @@ function HomePage({ bookCar }) {
               <h2>{car.name}</h2>
               <button
                 className="btn-2 btn-car"
-                onClick={() => bookCar(car)} // тепер bookCar буде оновлювати стан
+                onClick={() => handleBookCar(car.name)}
+                disabled={car.quantity === 0}
               >
-                <p>Забронювати</p>
+                <p>{car.quantity > 0 ? "Забронювати" : "Недоступно"}</p>
               </button>
             </div>
           ))}
         </div>
+        <button className="btn-2 btn-all-cars" onClick={() => navigate('/collection')}>
+          <p>Переглянути всі </p>
+        </button>
       </section>
  {/* Про Нас */}
  <section className="about" id="about">
@@ -170,7 +170,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage bookCar={bookCar} />} /> 
-        <Route path="#about" element={<HomePage bookCar={bookCar} />} />
+        <Route path="/#about" element={<HomePage bookCar={bookCar} />} />
         <Route path="/booking" element={<BookingPage bookCar={bookCar} />} /> 
         <Route path="/collection" element={<CollectionPage bookCar={bookCar} />} />
         <Route path="/yourbooks" element={<YourBookingsPage bookings={bookings} />} />

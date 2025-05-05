@@ -8,7 +8,7 @@ const initialCars = [
   { name: "Ford Focus", price: "4000 грн", transmission: "Механіка", quantity: 2, img: "img/focus.jpg" },
   { name: "Kia Soul", price: "3500 грн", transmission: "Автомат", quantity: 1, img: "img/kiasoul.jpg" },
   { name: "BMW 3 f30", price: "7000 грн", transmission: "Автомат", quantity: 3, img: "img/images.jpg" },
-  { name: "BMW 5 G30", price: "9000 грн", transmission: "Автомат", quantity: 8, img: "img/bmw g30.jpg" },
+  { name: "BMW 5 g30", price: "9000 грн", transmission: "Автомат", quantity: 8, img: "img/bmw g30.jpg" },
   { name: "Renaut Megan 2", price: "3500 грн", transmission: "Механіка", quantity: 2, img: "img/megan.jpg" },
   { name: "Citroen Berlingo", price: "5000 грн", transmission: "Механіка", quantity: 3, img: "img/berlingo.jpg" },
   { name: "Mercedes C class", price: "7500 грн", transmission: "Автомат", quantity: 3, img: "img/merin.jpg" },
@@ -16,29 +16,45 @@ const initialCars = [
   { name: "Volvo XC60", price: "6000 грн", transmission: "Автомат", quantity: 1, img: "img/volvo.jpg" },
   { name: "Peugeot 5008", price: "3000 грн", transmission: "Механіка", quantity: 1, img: "img/peugeot.jpg" },
 ];
+
 const Collection = () => {
+  useStickyNavbar();
+  useMenuToggle();
+  const [filteredCars, setFilteredCars] = useState(initialCars);
+  const [transmissionFilter, setTransmissionFilter] = useState('Усі');
+  const [sortOrder, setSortOrder] = useState('');
+
   const navigate = useNavigate();
-  const [cars, setCars] = useState(initialCars); 
-    useStickyNavbar();
-    useMenuToggle();
 
-  const handleBookCar = (carName) => {
-    // Викликати твою функцію бронювання
-    bookCar?.(carName);
+  useEffect(() => {
+    let updatedCars = [...initialCars];
 
-    // Зменшити кількість доступних машин після бронювання
-    setCars(prevCars =>
-      prevCars.map(car =>
-        car.name === carName && car.quantity > 0
-          ? { ...car, quantity: car.quantity - 1 }
-          : car
-      )
-    );
+    if (transmissionFilter !== 'Усі') {
+      updatedCars = updatedCars.filter(
+        car => car.transmission === transmissionFilter
+      );
+    }
+
+    if (sortOrder === 'asc') {
+      updatedCars.sort((a, b) =>
+        parseInt(a.price.replace(/[^\d]/g, '')) - parseInt(b.price.replace(/[^\d]/g, ''))
+      );
+    } else if (sortOrder === 'desc') {
+      updatedCars.sort((a, b) =>
+        parseInt(b.price.replace(/[^\d]/g, '')) - parseInt(a.price.replace(/[^\d]/g, ''))
+      );
+    }
+
+    setFilteredCars(updatedCars);
+  }, [transmissionFilter, sortOrder]);
+
+  const handleBook = (car) => {
+    bookCar(car);
   };
 
   return (
     <div>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
       
       {/* Навігація */}
       <nav>
@@ -67,12 +83,26 @@ const Collection = () => {
 
       <section className="collection">
         <h1>Всі автомобілі</h1>
-        <div className="collection-container">
-          {cars.map((car, index) => (
-            <div key={index} className="collection-car-item">
-              <img src={car.img} alt={car.name} />
-              <div className="car-info-container">
-                <div className="car-info">
+        <div className="filters" >
+        <select className='transmission-filter' value={transmissionFilter} onChange={(e) => setTransmissionFilter(e.target.value)}>
+          <option value="Усі">Сортувати за Трансмісією</option>
+          <option value="Автомат">Автомат</option>
+          <option value="Механіка">Механіка</option>
+        </select>
+
+        <select className='price-filter' value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+          <option value="">Сортувати за ціною</option>
+          <option value="asc">Від найдешевших</option>
+          <option value="desc">Від найдорожчих</option>
+        </select>
+      </div>
+
+      <div className="collection-container">
+        {filteredCars.map((car, index) => (
+          <div key={index} className="collection-car-item">
+            <img src={car.img} alt={car.name} />
+            <div className="car-info-container">
+            <div className="car-info">
                   <div className="car-price">
                     <h5>Ціна:</h5>
                     <h6>{car.price}/день</h6>
@@ -86,18 +116,19 @@ const Collection = () => {
                     <h6>{car.quantity}</h6>
                   </div>
                 </div>
-              </div>
-              <h2>{car.name}</h2>
-              <button
+            </div>
+            <h2>{car.name}</h2>
+            <button
                 className="btn-2 btn-car"
-                onClick={() => handleBookCar(car.name)}
+                onClick={() => handleBook(car.name)}
                 disabled={car.quantity === 0}
               >
                 <p>{car.quantity > 0 ? "Забронювати" : "Недоступно"}</p>
               </button>
-            </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
+        
       </section>
 
       <footer>
