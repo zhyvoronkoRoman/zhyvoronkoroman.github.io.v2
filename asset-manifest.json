@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/zhyvoronkoroman.github.io.v2/static/css/main.6a156160.css",
+    "main.css": "/zhyvoronkoroman.github.io.v2/static/css/main.01f897bd.css",
     "main.js": "/zhyvoronkoroman.github.io.v2/static/js/main.dc835efb.js",
     "index.html": "/zhyvoronkoroman.github.io.v2/index.html",
-    "main.6a156160.css.map": "/zhyvoronkoroman.github.io.v2/static/css/main.6a156160.css.map",
+    "main.01f897bd.css.map": "/zhyvoronkoroman.github.io.v2/static/css/main.01f897bd.css.map",
     "main.dc835efb.js.map": "/zhyvoronkoroman.github.io.v2/static/js/main.dc835efb.js.map"
   },
   "entrypoints": [
-    "static/css/main.6a156160.css",
+    "static/css/main.01f897bd.css",
     "static/js/main.dc835efb.js"
   ]
 }
